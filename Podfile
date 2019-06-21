@@ -77,11 +77,11 @@ def shared_with_extension_pods
 end
 
 def gutenberg(options)
-    options[:git] = 'http://github.com/wordpress-mobile/gutenberg-mobile/'
-    local_gutenberg = ENV['LOCAL_GUTENBERG']
-    if local_gutenberg
-      options = { :path => local_gutenberg.include?('/') ? local_gutenberg : '../gutenberg-mobile' }
-    end
+#    options[:git] = 'http://github.com/wordpress-mobile/gutenberg-mobile/'
+#    local_gutenberg = ENV['LOCAL_GUTENBERG']
+#    if local_gutenberg
+#      options = { :path => local_gutenberg.include?('/') ? local_gutenberg : '../gutenberg-mobile' }
+#    end
     pod 'Gutenberg', options
     pod 'RNTAztecView', options
 
@@ -95,6 +95,27 @@ def gutenberg_dependencies(options)
         'Folly',
         'react-native-safe-area',
         'react-native-video',
+        'DoubleConversion',
+        'glog',
+        'React-Core',
+        'React-DevSupport',
+        'React-cxxreact',
+        'React-jsinspector',
+        'React-jsiexecutor',
+        'React-jsi',
+        'React-RCTWebSocket',
+        'React-fishhook',
+        'React-RCTActionSheet',
+        'React-RCTAnimation',
+        'React-RCTBlob',
+        'React-RCTImage',
+        'React-RCTNetwork',
+        'React-RCTLinking',
+        'React-RCTSettings',
+        'React-RCTText',
+        'React-RCTVibration',
+        'React-Fabric',
+        'React-graphics',
     ]
     if options[:path]
         podspec_prefix = options[:path]
@@ -121,7 +142,7 @@ target 'WordPress' do
     ## Gutenberg (React Native)
     ## =====================
     ##
-    gutenberg :tag => 'v1.7.0'
+    gutenberg :path => '../gutenberg-mobile' #:tag => 'v1.7.0'
 
     pod 'RNSVG', :git => 'https://github.com/wordpress-mobile/react-native-svg.git', :tag => '9.3.3-gb'
     pod 'react-native-keyboard-aware-scroll-view', :git => 'https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git', :tag => 'gb-v0.8.7'
@@ -346,21 +367,21 @@ end
 # Make all pods that are not shared across multiple targets into static frameworks by overriding the static_framework? function to return true
 # Linking the shared frameworks statically would lead to duplicate symbols
 # A future version of CocoaPods may make this easier to do. See https://github.com/CocoaPods/CocoaPods/issues/7428
-shared_targets = ['WordPressFlux', 'WordPressComStatsiOS']
-pre_install do |installer|
-    static = []
-    dynamic = []
-    installer.pod_targets.each do |pod|
-        # If this pod is a dependency of one of our shared targets, it must be linked dynamically
-        if pod.target_definitions.any? { |t| shared_targets.include? t.name }
-          dynamic << pod
-          next
-        end
-        static << pod
-        def pod.static_framework?;
-          true
-        end
-    end
-    puts "Installing #{static.count} pods as static frameworks"
-    puts "Installing #{dynamic.count} pods as dynamic frameworks"
-end
+#shared_targets = ['WordPressFlux', 'WordPressComStatsiOS']
+#pre_install do |installer|
+#    static = []
+#    dynamic = []
+#    installer.pod_targets.each do |pod|
+#        # If this pod is a dependency of one of our shared targets, it must be linked dynamically
+#        if pod.target_definitions.any? { |t| shared_targets.include? t.name }
+#          dynamic << pod
+#          next
+#        end
+#        static << pod
+#        def pod.static_framework?;
+#          true
+#        end
+#    end
+#    puts "Installing #{static.count} pods as static frameworks"
+#    puts "Installing #{dynamic.count} pods as dynamic frameworks"
+#end
