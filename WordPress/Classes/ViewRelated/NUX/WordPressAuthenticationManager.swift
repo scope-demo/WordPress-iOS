@@ -240,9 +240,13 @@ extension WordPressAuthenticationManager: WordPressAuthenticatorDelegate {
     /// Whenever a WordPress.com acocunt has been created during the Auth flow, we'll add a new local WPCOM Account, and set it as
     /// the new DefaultWordPressComAccount.
     ///
-    func createdWordPressComAccount(username: String, authToken: String) {
+    func createdWordPressComAccount(username: String, authToken: String, appleUser: String?) {
         let context = ContextManager.sharedInstance().mainContext
         let service = AccountService(managedObjectContext: context)
+
+        #warning("This is only for testing. It needs to be replaced")
+        UserDefaults.standard.set(appleUser, forKey: "apple_user")
+        UserDefaults.standard.synchronize()
 
         let account = service.createOrUpdateAccount(withUsername: username, authToken: authToken)
         if service.defaultWordPressComAccount() == nil {

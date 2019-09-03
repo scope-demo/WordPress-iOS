@@ -6,6 +6,7 @@ import WordPressAuthenticator
 import WordPressComStatsiOS
 import WordPressShared
 import AlamofireNetworkActivityIndicator
+import AuthenticationServices
 
 #if !XCODE11
 import ZendeskCoreSDK
@@ -87,6 +88,13 @@ class WordPressAppDelegate: UIResponder, UIApplicationDelegate {
         disableAnimationsForUITests(application)
 
         PushNotificationsManager.shared.deletePendingLocalNotifications()
+
+        #if XCODE11
+        if #available(iOS 13, *) {
+            checkAppleIDCredentialState()
+            startObservingAppleIDCredentialRevoked()
+        }
+        #endif
 
         NotificationCenter.default.post(name: .applicationLaunchCompleted, object: nil)
         return true
@@ -409,6 +417,41 @@ extension WordPressAppDelegate {
         WordPressAuthenticator.shared.delegate = authManager
     }
 
+    #if XCODE11
+    @available(iOS 13.0, *)
+    func checkAppleIDCredentialState() {
+        #warning("This is only for testing. It needs to be replaced")
+        guard AccountHelper.isLoggedIn, let userID = UserDefaults.standard.value(forKey: "apple_user") as? String else {
+            return
+        }
+
+        WordPressAuthenticator.shared.checkAppleIDCredentialState(for: userID) { (revoked, error) in
+            if AccountHelper.isLoggedIn, revoked {
+                //Sign out user
+                DDLogInfo("User signed out because the AppleID Credential has been revoked")
+
+                if let error = error {
+                    DDLogError("AppleID Credential State revoked: \(error)")
+                }
+            }
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func startObservingAppleIDCredentialRevoked() {
+        WordPressAuthenticator.shared.startObservingAppleIDCredentialRevoked {
+            if AccountHelper.isLoggedIn {
+                DDLogInfo("### Observer: User signed out because the AppleID Credential has been revoked")
+            }
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func stopObservingAppleIDCredentialRevoked() {
+        WordPressAuthenticator.shared.stopObservingAppleIDCredentialRevoked()
+    }
+    #endif
+
     func handleWebActivity(_ activity: NSUserActivity) {
         guard AccountHelper.isLoggedIn,
             activity.activityType == NSUserActivityTypeBrowsingWeb,
@@ -685,12 +728,22 @@ extension WordPressAppDelegate {
         if notification.object != nil {
             setupShareExtensionToken()
             configureNotificationExtension()
+            #if XCODE11
+            if #available(iOS 13, *) {
+                startObservingAppleIDCredentialRevoked()
+            }
+            #endif
         } else {
             trackLogoutIfNeeded()
             removeTodayWidgetConfiguration()
             removeShareExtensionConfiguration()
             removeNotificationExtensionConfiguration()
             showWelcomeScreenIfNeeded(animated: false)
+            #if XCODE11
+            if #available(iOS 13, *) {
+                stopObservingAppleIDCredentialRevoked()
+            }
+            #endif
         }
 
         toggleExtraDebuggingIfNeeded()
