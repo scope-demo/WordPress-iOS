@@ -1,0 +1,23 @@
+name: Scope Testing
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout
+    - uses: actions/checkout@v1
+    - name: Dependencies`
+      run: rake dependencies
+    - name: Scope for iOS
+      uses: undefinedlabs/scope-for-ios-action@v1
+      with:
+        dsn: ${{ secrets.SCOPE_DSN }}
+        workspace: WordPress.xcworkspace
+        scheme: WordPress
+        instrumentHttpPayloads: true
+
+
