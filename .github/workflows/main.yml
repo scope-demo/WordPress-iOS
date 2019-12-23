@@ -19,4 +19,3 @@ jobs:
         workspace: WordPress.xcworkspace
         scheme: WordPress
         instrumentHttpPayloads: true
-
