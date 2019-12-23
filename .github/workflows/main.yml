@@ -20,4 +20,3 @@ jobs:
         scheme: WordPress
         instrumentHttpPayloads: true
 
-
