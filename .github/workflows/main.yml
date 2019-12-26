@@ -13,7 +13,7 @@ jobs:
     - name: Dependencies`
       run: rake dependencies
     - name: Scope for iOS
-      uses: undefinedlabs/scope-for-ios-action@debugCoverage
+      uses: undefinedlabs/scope-for-ios-action@v1
       with:
         dsn: ${{ secrets.SCOPE_DSN }}
         workspace: WordPress.xcworkspace
