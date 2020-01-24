@@ -12,10 +12,12 @@ jobs:
       uses: actions/checkout@v1
     - name: Dependencies`
       run: rake dependencies
-    - name: Scope for iOS
-      uses: undefinedlabs/scope-for-ios-action@v1
+    - name: Scope for Swift
+      uses: undefinedlabs/scope-for-swift-action@v1
       with:
         dsn: ${{ secrets.SCOPE_DSN }}
         workspace: WordPress.xcworkspace
         scheme: WordPress
-        instrumentHttpPayloads: true
+        codePath: true
+      env:
+        SCOPE_INSTRUMENTATION_HTTP_PAYLOADS: YES
