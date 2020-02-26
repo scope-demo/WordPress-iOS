@@ -1,5 +1,16 @@
-- Artık bir yorum yazarken tam ekran moduna geçebilirsiniz, böylece hiçbir şey yazma işleminizden uzaklaşmaz ve çekiminizin sıcaklığını en üst düzeye çıkarabilirsiniz.
-- Neredeyse hiçbir zaman istatistiklerinize bakmadığınızdan eminiz çünkü hayatta daha önemli şeyler var, ancak göz atmanız durumunda, İstatistikler bileşeninde doğru istatistikler gösterilecek, okuma yapmak için Bugün bileşeninde büyük sayıları kısalttık Insights görünümünü en sık eklenen kartlara göre güncelledik.
-- Bazı programlanmış yayınlar, tamamen hata yapan ve sizinle uğraşmaya çalıştığımız yanlış zaman damgaları gösterdi. Bu düzeltildi. Ayrıca, bir bildirime dokunduğunuzda uygulamanın kilitlenmesine neden olan bir hatayı da düzelttik.
-- Diğer uygulamalardan içe aktarılan dosyaları rastgele yeniden adlandıracak başka bir hata vardı. Hatayı düzeltip düzeltmeyeceğimiz veya rastgele adların her zaman komik olduğundan emin olduk ve uzun bir süre sonra “Hatayı düzeltin” konusunda uzun bir konuşma yaptık.
-- Blok editör bir şeyleri geri almaya çalıştığınızda bazen çökebiliyordu, özellikle biraz fazla geri al yaptığınız zamanlarda. Bu düzeltildi. Bununla birlikte görsellerin yer tutucularındaki ufak hatalar da giderildi.
+Yorum yapma:
+- Yorumları düzenlerken metin seçiminin yanlış satırda olmasına neden olan bir hata düzeltildi.
+- HTML işaretlemesinin yorum içeriğinde görüntülenmesine neden olan bir hata düzeltildi.
+- Yorumların okuyucuda görünmemesine neden olan bir sorun düzeltildi.
+
+Yayıncılık:
+- Artık bir yazıdaki görüntüleri kırpabilir, yakınlaştırabilir / uzaklaştırabilir ve döndürebilirsiniz.
+- Uygulama artık iPhone'da bir masaüstü ön izleme modu ve iPad'de mobil ön izleme içeriyor. Yayın ön izlemesinde ayrıca "Safari'de aç" ve "Paylaş seçenekleri" gibi yeni gezinme seçenekleri de vardır.
+- Çok sayıda blok düzenleyici geliştirmesi: Blokları önce / sonra eklemek için uzun basma simgesi ve seçilen görüntü bloklarına “Düzenle” düğmesi kaplaması eklendi. Düzenleyici, bağlantı sorunlarından sonra görüntüleri yüklemeyi yeniden deneyecek. Galeri bloğu artık görüntü boyutu seçeneklerini destekliyor.
+- Bir taslak gönderideki yorumları önizlerken devre dışı bırakabilecek bir hatayı düzelttik.
+
+Kayıt ve Giriş
+- Sihirli bağlantı yoluyla kaydolma veya giriş artık birden çok e-posta istemcisini destekliyor. “E-postayı aç” düğmesine dokunduğunuzda, seçebileceğiniz yüklü e-posta istemcilerinin bir listesi gösterilir.
+
+Okuyucu
+- Uygulamalar artık yeniden blog yazmayı destekliyor! Sitelerinizden hangilerine yayın yapılacağını seçmek ve seçtiğiniz editörü orijinal yayından önceden doldurulmuş içerikle açmak için yayınlama işlem çubuğundaki yeni "yeniden blog" düğmesine dokunun.
