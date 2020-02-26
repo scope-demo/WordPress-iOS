@@ -1,5 +1,16 @@
-- Nu kan du växla till fullskärmsläge när du skriver en kommentar, så att ingenting stör dig medan du skriver och du i lugn och ro kan hitta precis rätt ord.
-- Du tittar väl nästan aldrig på statistiken, det finns ju massor av andra, långt viktigare saker här i livet. Men om du ibland kollar statistiken visar statistik-widgeten nu korrekta uppgifter. I widgeten ”Idag” har vi kortat ner de stora talen för att göra dem enklare att läsa. Vi har även uppdaterat vyn ”insikter” utifrån vilka kort som oftast läggs till.
-- Vissa schemalagda inlägg hade tidigare felaktiga tidsangivelser. Det var ett fel i programmet och inte någon som försökte busa. Nu är det rättat. Vi har också fixat ett annat fel som fick appen att krascha när du tryckte en notifiering.
-- Ett annat programfel kunde slumpmässigt ändra namn på filer som importerats från andra appar. Efter en lång intern diskussion om vi borde rätta buggen eller se till så att de slumpmässiga filnamnen alltid var helgalna, röstade de flesta på att ändå rätta felet.
-- Blockredigeraren kunde ibland krascha när du försökte att ångra vissa åtgärder (vilket ledde till att man automatiskt ”ångrade” mer än man tänkt). Det är också rättat nu, liksom några mindre fel kring hantering av bilder som kunde orsaka vissa underligheter med platsmarkörer för bilder.
+Kommentarer:
+- Rättat ett fel där markeringen av text hamnade på fel rad när man redigerade kommentarer.
+- Rättat ett fel som kunde göra att HTML-kod visades i kommentarers innehåll.
+- Rättat ett fel som gjorde att kommentarer inte visades i läsaren.
+
+Publicering:
+- Nu kan du beskära, förstora/förminska och rotera bilder i ett inlägg.
+- Nu innehåller appen ett förhandsgranskningsläge för datorskärm på iPhone och förhandsgranskning för mobil på iPad. Förhandsvisning av inlägg har nu ny en ny menypost: ”Öppna länk i Safari” och nya delningsalternativ.
+- En rad förbättringar av blockredigeraren: Lagt till en ikon för långt tryck för infogning av block före/efter och ett överlägg ”Redigera” på vissa bildblock. Redigeraren kommer att försöka ladda bilder på nytt efter eventuella problem med internetförbindelseen. Och blocket ”Galleri” har nu stöd för olika bildstorlekar.
+- Vi har rättat ett fel som kunde inaktivera kommentarer på ett utkast vid förhansgranskning.
+
+Registrering och inloggning
+- Nu stöder registrering och inloggning med hjälp av ”magiska länkar” flera olika e-postklienter. När man trycker på knappen ”öppna e-post” visas en lista där man kan välja mellan de e-postprogra som finns installerade.
+
+Läsaren
+- Nu har appen stöd för reblogging av inlägg! Tryck på den nya knappen ”reblogga” i verktygsfältet för åtgärder på inlägg och välj till vilka av dina webbplatser du vill publicera och öppna din favoritredigerare med innehållet från det ursprungliga inlägget redan inlagt.

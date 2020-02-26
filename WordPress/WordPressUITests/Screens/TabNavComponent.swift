@@ -3,7 +3,6 @@ import XCTest
 
 class TabNavComponent: BaseScreen {
 
-    let meTabButton: XCUIElement
     let mySitesTabButton: XCUIElement
     let readerTabButton: XCUIElement
     let writeTabButton: XCUIElement
@@ -13,14 +12,16 @@ class TabNavComponent: BaseScreen {
         let tabBars = XCUIApplication().tabBars["Main Navigation"]
         mySitesTabButton = tabBars.buttons["mySitesTabButton"]
         readerTabButton = tabBars.buttons["readerTabButton"]
-        writeTabButton = tabBars.buttons["Write"]
+        writeTabButton = XCUIApplication().buttons["floatingCreateButton"]
         notificationsTabButton = tabBars.buttons["notificationsTabButton"]
-        meTabButton = tabBars.buttons["meTabButton"]
-        super.init(element: meTabButton)
+        super.init(element: mySitesTabButton)
     }
 
     func gotoMeScreen() -> MeTabScreen {
-        meTabButton.tap()
+        gotoMySitesScreen()
+        app.cells[WPUITestCredentials.testWPcomSitePrimaryAddress].tap()
+        let meButton = app.navigationBars.buttons["meBarButton"]
+        meButton.tap()
         return MeTabScreen()
     }
 
@@ -33,6 +34,7 @@ class TabNavComponent: BaseScreen {
         return MySiteScreen()
     }
 
+    @discardableResult
     func gotoMySitesScreen() -> MySitesScreen {
         mySitesTabButton.tap()
         mySitesTabButton.tap()
