@@ -11,7 +11,7 @@ extension WPTabBarController {
         // If we are already showing a view controller, dismiss and show the editor afterward
         guard presentedViewController == nil else {
             dismiss(animated: true) { [weak self] in
-                self?.showPageTab(blog: inBlog, title: title, content: content, source: source)
+                self?.showPageEditor(blog: inBlog, title: title, content: content, source: source)
             }
             return
         }
@@ -25,7 +25,7 @@ extension WPTabBarController {
         page.content = content
 
         let blogID = blog.dotComID?.intValue ?? 0 as Any
-        WPAnalytics.track(WPAnalyticsEvent.editorCreatedPage, properties: ["tap_source": source, WPAppAnalyticsKeyBlogID: blogID])
+        WPAnalytics.track(WPAnalyticsEvent.editorCreatedPage, properties: ["tap_source": source, WPAppAnalyticsKeyBlogID: blogID, WPAppAnalyticsKeyPostType: "page"])
 
         let editorFactory = EditorFactory()
 

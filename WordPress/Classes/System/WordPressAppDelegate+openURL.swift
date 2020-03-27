@@ -150,7 +150,7 @@ import AutomatticTracks
 
         WPTabBarController.sharedInstance()?.present(postVC, animated: true, completion: nil)
 
-        WPAppAnalytics.track(.editorCreatedPost, withProperties: ["tap_source": "url_scheme"])
+        WPAppAnalytics.track(.editorCreatedPost, withProperties: ["tap_source": "url_scheme", WPAppAnalyticsKeyPostType: "post"])
 
         return true
     }
@@ -178,7 +178,7 @@ import AutomatticTracks
         // Should more formats be accepted be accepted in the future, this line would have to be expanded to accomodate it.
         let contentEscaped = contentRaw.escapeHtmlNamedEntities()
 
-        WPTabBarController.sharedInstance()?.showPageTab(blog: blog, title: title, content: contentEscaped, source: "url_scheme")
+        WPTabBarController.sharedInstance()?.showPageEditor(blog: blog, title: title, content: contentEscaped, source: "url_scheme")
 
         return true
     }
