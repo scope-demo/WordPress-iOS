@@ -1263,9 +1263,7 @@ FeaturedImageViewControllerDelegate>
     PostTagPickerViewController *tagsPicker = [[PostTagPickerViewController alloc] initWithTags:self.post.tags blog:self.post.blog];
 
     tagsPicker.onValueChanged = ^(NSString * _Nonnull value) {
-        if (!value.isEmpty) {
-            [WPAnalytics trackEvent:WPAnalyticsEventEditorPostTagsAdded properties:@{@"via": @"settings"}];
-        }
+        [WPAnalytics trackEvent:WPAnalyticsEventEditorPostTagsChanged properties:@{@"via": @"settings"}];
 
         self.post.tags = value;
     };
@@ -1447,8 +1445,7 @@ FeaturedImageViewControllerDelegate>
 
 - (void)updateFeaturedImageCell:(PostFeaturedImageCell *)cell
 {
-    self.featuredImage = cell.image;
-    cell.accessibilityIdentifier = @"Current Featured Image";
+    self.featuredImage = cell.image;    
     NSInteger featuredImageSection = [self.sections indexOfObject:@(PostSettingsSectionFeaturedImage)];
     NSIndexSet *featuredImageSectionSet = [NSIndexSet indexSetWithIndex:featuredImageSection];
     [self.tableView reloadSections:featuredImageSectionSet withRowAnimation:UITableViewRowAnimationNone];
@@ -1463,6 +1460,7 @@ FeaturedImageViewControllerDelegate>
     self.animatedFeaturedImageData = nil;
     [self.apost setFeaturedImage:nil];
     [self dismissViewControllerAnimated:YES completion:nil];
+    [self.tableView reloadData];
 }
 
 @end
