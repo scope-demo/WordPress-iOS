@@ -22,6 +22,13 @@ class GutenbergViewController: UIViewController, PostEditor {
     private lazy var filesAppMediaPicker: GutenbergFilesAppMediaSource = {
         return GutenbergFilesAppMediaSource(gutenberg: gutenberg, mediaInserter: mediaInserterHelper)
     }()
+    private lazy var tenorMediaPicker: GutenbergTenorMediaPicker = {
+        return GutenbergTenorMediaPicker(gutenberg: gutenberg, mediaInserter: mediaInserterHelper)
+    }()
+
+    lazy var gutenbergSettings: GutenbergSettings = {
+        return GutenbergSettings()
+    }()
 
     // MARK: - Aztec
 
@@ -221,7 +228,7 @@ class GutenbergViewController: UIViewController, PostEditor {
     private var isFirstGutenbergLayout = true
     var shouldPresentInformativeDialog = false
     lazy var shouldPresentPhase2informativeDialog: Bool = {
-        return GutenbergSettings().shouldPresentInformativeDialog(for: post.blog)
+        return gutenbergSettings.shouldPresentInformativeDialog(for: post.blog)
     }()
 
     // MARK: - Initializers
@@ -251,6 +258,7 @@ class GutenbergViewController: UIViewController, PostEditor {
     }
 
     deinit {
+        tearDownKeyboardObservers()
         removeObservers(fromPost: post)
         gutenberg.invalidate()
         attachmentDelegate.cancelAllPendingMediaRequests()
@@ -260,6 +268,7 @@ class GutenbergViewController: UIViewController, PostEditor {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupKeyboardObservers()
         WPFontManager.loadNotoFontFamily()
         createRevisionOfPost(loadAutosaveRevision: loadAutosaveRevision)
         setupGutenbergView()
@@ -275,7 +284,43 @@ class GutenbergViewController: UIViewController, PostEditor {
         verificationPromptHelper?.updateVerificationStatus()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Handles refreshing controls with state context after options screen is dismissed
+        editorContentWasUpdated()
+    }
+
     // MARK: - Functions
+
+    private var keyboardShowObserver: Any?
+    private var keyboardHideObserver: Any?
+    private var keyboardFrame = CGRect.zero
+    private var mentionsBottomConstraint: NSLayoutConstraint?
+    private var previousFirstResponder: UIView?
+
+    private func setupKeyboardObservers() {
+        keyboardShowObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidShowNotification, object: nil, queue: .main) { (notification) in
+            if let keyboardRect = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                self.keyboardFrame = keyboardRect
+                self.updateConstraintsToAvoidKeyboard(frame: keyboardRect)
+            }
+        }
+        keyboardHideObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidShowNotification, object: nil, queue: .main) { (notification) in
+            if let keyboardRect = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                self.keyboardFrame = keyboardRect
+                self.updateConstraintsToAvoidKeyboard(frame: keyboardRect)
+            }
+        }
+    }
+
+    private func tearDownKeyboardObservers() {
+        if let keyboardShowObserver = keyboardShowObserver {
+            NotificationCenter.default.removeObserver(keyboardShowObserver)
+        }
+        if let keyboardHideObserver = keyboardHideObserver {
+            NotificationCenter.default.removeObserver(keyboardHideObserver)
+        }
+    }
 
     private func configureNavigationBar() {
         navigationController?.navigationBar.isTranslucent = false
@@ -378,8 +423,14 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             gutenbergDidRequestMediaFromDevicePicker(filter: flags, allowMultipleSelection: allowMultipleSelection, with: callback)
         case .deviceCamera:
             gutenbergDidRequestMediaFromCameraPicker(filter: flags, with: callback)
+
         case .stockPhotos:
             stockPhotos.presentPicker(origin: self, post: post, multipleSelection: allowMultipleSelection, callback: callback)
+        case .tenor:
+            tenorMediaPicker.presentPicker(origin: self,
+                                           post: post,
+                                           multipleSelection: allowMultipleSelection,
+                                           callback: callback)
         case .filesApp:
             filesAppMediaPicker.presentPicker(origin: self, filters: filter, multipleSelection: allowMultipleSelection, callback: callback)
         default: break
@@ -605,6 +656,71 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         controller.modalPresentationStyle = .overCurrentContext
         self.present(controller, animated: true)
     }
+
+    func updateConstraintsToAvoidKeyboard(frame: CGRect) {
+        keyboardFrame = frame
+        let minimumKeyboardHeight = CGFloat(50)
+        guard let mentionsBottomConstraint = mentionsBottomConstraint else {
+            return
+        }
+
+        // There are cases where the keyboard is not visible, but the system instead of returning zero, returns a low number, for example: 0, 3, 69.
+        // So in those scenarios, we just need to take in account the safe area and ignore the keyboard all together.
+        if keyboardFrame.height < minimumKeyboardHeight {
+            mentionsBottomConstraint.constant = -self.view.safeAreaInsets.bottom
+        }
+        else {
+            mentionsBottomConstraint.constant = -self.keyboardFrame.height
+        }
+    }
+
+    func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void) {
+        DispatchQueue.main.async(execute: { [weak self] in
+            self?.mentionShow(callback: callback)
+        })
+    }
+
+    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
+        return gutenbergSettings.starterPageTemplatesTooltipShown
+    }
+    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
+        gutenbergSettings.starterPageTemplatesTooltipShown = tooltipShown
+    }
+}
+
+// MARK: - Mention implementation
+
+extension GutenbergViewController {
+
+    private func mentionShow(callback: @escaping (Swift.Result<String, NSError>) -> Void) {
+        guard let siteID = post.blog.dotComID else {
+            callback(.failure(GutenbergMentionsViewController.MentionError.notAvailable as NSError))
+            return
+        }
+
+        previousFirstResponder = view.findFirstResponder()
+        let mentionsController = GutenbergMentionsViewController(siteID: siteID)
+        mentionsController.onCompletion = { (result) in
+            callback(result)
+            mentionsController.view.removeFromSuperview()
+            mentionsController.removeFromParent()
+            if let previousFirstResponder = self.previousFirstResponder {
+                previousFirstResponder.becomeFirstResponder()
+            }
+        }
+        addChild(mentionsController)
+        view.addSubview(mentionsController.view)
+        let mentionsBottomConstraint = mentionsController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+        NSLayoutConstraint.activate([
+            mentionsController.view.leadingAnchor.constraint(equalTo: view.safeLeadingAnchor, constant: 0),
+            mentionsController.view.trailingAnchor.constraint(equalTo: view.safeTrailingAnchor, constant: 0),
+            mentionsBottomConstraint,
+            mentionsController.view.topAnchor.constraint(equalTo: view.safeTopAnchor)
+        ])
+        self.mentionsBottomConstraint = mentionsBottomConstraint
+        updateConstraintsToAvoidKeyboard(frame: keyboardFrame)
+        mentionsController.didMove(toParent: self)
+    }
 }
 
 // MARK: - GutenbergBridgeDataSource
@@ -637,8 +753,15 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
         return [
             post.blog.supports(.stockPhotos) ? .stockPhotos : nil,
+            FeatureFlag.tenor.enabled ? .tenor : nil,
             .filesApp,
         ].compactMap { $0 }
+    }
+
+    func gutenbergCapabilities() -> [String: Bool]? {
+        return [
+            "mentions": post.blog.isAccessibleThroughWPCom()
+        ]
     }
 }
 
@@ -695,9 +818,7 @@ extension GutenbergViewController: PostEditorNavigationBarManagerDelegate {
     }
 
     var isPublishButtonEnabled: Bool {
-        // TODO: return postEditorStateContext.isPublishButtonEnabled when
-        // we have the required bridge communication that informs us every change
-        return true
+         return postEditorStateContext.isPublishButtonEnabled
     }
 
     var uploadingButtonSize: CGSize {
@@ -738,6 +859,7 @@ extension GutenbergViewController: PostEditorNavigationBarManagerDelegate {
 extension Gutenberg.MediaSource {
     static let stockPhotos = Gutenberg.MediaSource(id: "wpios-stock-photo-library", label: .freePhotosLibrary, types: [.image])
     static let filesApp = Gutenberg.MediaSource(id: "wpios-files-app", label: .files, types: [.image, .video, .audio, .other])
+    static let tenor = Gutenberg.MediaSource(id: "wpios-tenor", label: .tenor, types: [.image])
 }
 
 private extension GutenbergViewController {
